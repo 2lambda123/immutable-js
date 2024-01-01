@@ -68,9 +68,9 @@ Now the Map is typed like this:
 
 ```ts
 MapOf<{
-    length: number;
-    1: string;
-}>
+  length: number;
+  1: string;
+}>;
 ```
 
 and the return type of `m.get('length')` is typed as `number`.
