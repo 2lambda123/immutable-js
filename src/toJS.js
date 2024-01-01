@@ -1,12 +1,14 @@
-import { Seq } from './Seq';
-import { isCollection } from './predicates/isCollection';
-import { isKeyed } from './predicates/isKeyed';
+import {isCollection} from './predicates/isCollection';
+import {isKeyed} from './predicates/isKeyed';
+import {Seq} from './Seq';
 import isDataStructure from './utils/isDataStructure';
 import isPlainObject from './utils/isPlainObj';
 
 export function toJS(value) {
   const circularStack =
-    typeof WeakSet === 'undefined' ? new Set() : new WeakSet(); // WeakSet is not available in IE11.
+      typeof WeakSet === 'undefined'
+          ? new Set()
+          : new WeakSet(); // WeakSet is not available in IE11.
 
   return toJSWithCircularCheck(circularStack, value);
 }
@@ -37,15 +39,13 @@ function toJSWithCircularCheck(circularStack, value) {
   }
   if (isKeyed(value)) {
     const result = {};
-    value.__iterate((v, k) => {
-      result[k] = toJSWithCircularCheck(circularStack, v);
-    });
+    value.__iterate(
+        (v, k) => { result[k] = toJSWithCircularCheck(circularStack, v); });
     return result;
   }
   const result = [];
-  value.__iterate(v => {
-    result.push(toJSWithCircularCheck(circularStack, v));
-  });
+  value.__iterate(
+      v => { result.push(toJSWithCircularCheck(circularStack, v)); });
   circularStack.delete(value);
 
   return result;
