@@ -1,16 +1,16 @@
-import {IndexedCollection} from './Collection';
-import {hasIterator, Iterator, iteratorDone, iteratorValue} from './Iterator';
-import {asImmutable} from './methods/asImmutable';
-import {asMutable} from './methods/asMutable';
-import {deleteIn} from './methods/deleteIn';
-import {mergeDeepIn} from './methods/mergeDeepIn';
-import {mergeIn} from './methods/mergeIn';
-import {setIn} from './methods/setIn';
-import {update} from './methods/update';
-import {updateIn} from './methods/updateIn';
-import {wasAltered} from './methods/wasAltered';
-import {withMutations} from './methods/withMutations';
-import {IS_LIST_SYMBOL, isList} from './predicates/isList';
+import { IndexedCollection } from './Collection';
+import { hasIterator, Iterator, iteratorDone, iteratorValue } from './Iterator';
+import { asImmutable } from './methods/asImmutable';
+import { asMutable } from './methods/asMutable';
+import { deleteIn } from './methods/deleteIn';
+import { mergeDeepIn } from './methods/mergeDeepIn';
+import { mergeIn } from './methods/mergeIn';
+import { setIn } from './methods/setIn';
+import { update } from './methods/update';
+import { updateIn } from './methods/updateIn';
+import { wasAltered } from './methods/wasAltered';
+import { withMutations } from './methods/withMutations';
+import { IS_LIST_SYMBOL, isList } from './predicates/isList';
 import {
   DELETE,
   MakeRef,
@@ -52,9 +52,13 @@ export class List extends IndexedCollection {
     });
   }
 
-  static of(/*...values*/) { return this(arguments); }
+  static of(/*...values*/) {
+    return this(arguments);
+  }
 
-  toString() { return this.__toString('List [', ']'); }
+  toString() {
+    return this.__toString('List [', ']');
+  }
 
   // @pragma Access
 
@@ -70,16 +74,23 @@ export class List extends IndexedCollection {
 
   // @pragma Modification
 
-  set(index, value) { return updateList(this, index, value); }
-
-  remove(index) {
-    return !this.has(index)          ? this
-           : index === 0             ? this.shift()
-           : index === this.size - 1 ? this.pop()
-                                     : this.splice(index, 1);
+  set(index, value) {
+    return updateList(this, index, value);
   }
 
-  insert(index, value) { return this.splice(index, 0, value); }
+  remove(index) {
+    return !this.has(index)
+      ? this
+      : index === 0
+      ? this.shift()
+      : index === this.size - 1
+      ? this.pop()
+      : this.splice(index, 1);
+  }
+
+  insert(index, value) {
+    return this.splice(index, 0, value);
+  }
 
   clear() {
     if (this.size === 0) {
@@ -106,7 +117,9 @@ export class List extends IndexedCollection {
     });
   }
 
-  pop() { return setListBounds(this, 0, -1); }
+  pop() {
+    return setListBounds(this, 0, -1);
+  }
 
   unshift(/*...values*/) {
     const values = arguments;
@@ -118,7 +131,9 @@ export class List extends IndexedCollection {
     });
   }
 
-  shift() { return setListBounds(this, 1); }
+  shift() {
+    return setListBounds(this, 1);
+  }
 
   // @pragma Composition
 
@@ -127,8 +142,10 @@ export class List extends IndexedCollection {
     for (let i = 0; i < arguments.length; i++) {
       const argument = arguments[i];
       const seq = IndexedCollection(
-          typeof argument !== 'string' && hasIterator(argument) ? argument
-                                                                : [ argument ]);
+        typeof argument !== 'string' && hasIterator(argument)
+          ? argument
+          : [argument]
+      );
       if (seq.size !== 0) {
         seqs.push(seq);
       }
@@ -144,7 +161,9 @@ export class List extends IndexedCollection {
     });
   }
 
-  setSize(size) { return setListBounds(this, 0, size); }
+  setSize(size) {
+    return setListBounds(this, 0, size);
+  }
 
   map(mapper, context) {
     return this.withMutations(list => {
@@ -161,8 +180,11 @@ export class List extends IndexedCollection {
     if (wholeSlice(begin, end, size)) {
       return this;
     }
-    return setListBounds(this, resolveBegin(begin, size),
-                         resolveEnd(end, size));
+    return setListBounds(
+      this,
+      resolveBegin(begin, size),
+      resolveEnd(end, size)
+    );
   }
 
   __iterator(type, reverse) {
@@ -171,8 +193,8 @@ export class List extends IndexedCollection {
     return new Iterator(() => {
       const value = values();
       return value === DONE
-                 ? iteratorDone()
-                 : iteratorValue(type, reverse ? --index : index++, value);
+        ? iteratorDone()
+        : iteratorValue(type, reverse ? --index : index++, value);
     });
   }
 
@@ -200,8 +222,15 @@ export class List extends IndexedCollection {
       this.__altered = false;
       return this;
     }
-    return makeList(this._origin, this._capacity, this._level, this._root,
-                    this._tail, ownerID, this.__hash);
+    return makeList(
+      this._origin,
+      this._capacity,
+      this._level,
+      this._root,
+      this._tail,
+      ownerID,
+      this.__hash
+    );
   }
 }
 
@@ -221,10 +250,12 @@ ListPrototype.withMutations = withMutations;
 ListPrototype.wasAltered = wasAltered;
 ListPrototype.asImmutable = asImmutable;
 ListPrototype['@@transducer/init'] = ListPrototype.asMutable = asMutable;
-ListPrototype['@@transducer/step'] = function(result,
-                                              arr) { return result.push(arr); };
-ListPrototype['@@transducer/result'] = function(
-    obj) { return obj.asImmutable(); };
+ListPrototype['@@transducer/step'] = function (result, arr) {
+  return result.push(arr);
+};
+ListPrototype['@@transducer/result'] = function (obj) {
+  return obj.asImmutable();
+};
 
 ListPrototype.__empty = emptyList;
 
@@ -249,7 +280,7 @@ class VNode {
     if (level > 0) {
       const oldChild = this.array[originIndex];
       newChild =
-          oldChild && oldChild.removeBefore(ownerID, level - SHIFT, index);
+        oldChild && oldChild.removeBefore(ownerID, level - SHIFT, index);
       if (newChild === oldChild && removingFirst) {
         return this;
       }
@@ -282,7 +313,7 @@ class VNode {
     if (level > 0) {
       const oldChild = this.array[sizeIndex];
       newChild =
-          oldChild && oldChild.removeAfter(ownerID, level - SHIFT, index);
+        oldChild && oldChild.removeAfter(ownerID, level - SHIFT, index);
       if (newChild === oldChild && sizeIndex === this.array.length - 1) {
         return this;
       }
@@ -308,8 +339,9 @@ function iterateList(list, reverse) {
   return iterateNodeOrLeaf(list._root, list._level, 0);
 
   function iterateNodeOrLeaf(node, level, offset) {
-    return level === 0 ? iterateLeaf(node, offset)
-                       : iterateNode(node, level, offset);
+    return level === 0
+      ? iterateLeaf(node, offset)
+      : iterateNode(node, level, offset);
   }
 
   function iterateLeaf(node, offset) {
@@ -349,8 +381,11 @@ function iterateList(list, reverse) {
           return DONE;
         }
         const idx = reverse ? --to : from++;
-        values = iterateNodeOrLeaf(array && array[idx], level - SHIFT,
-                                   offset + (idx << level));
+        values = iterateNodeOrLeaf(
+          array && array[idx],
+          level - SHIFT,
+          offset + (idx << level)
+        );
       }
     };
   }
@@ -384,8 +419,9 @@ function updateList(list, index, value) {
 
   if (index >= list.size || index < 0) {
     return list.withMutations(list => {
-      index < 0 ? setListBounds(list, index).set(0, value)
-                : setListBounds(list, 0, index + 1).set(index, value);
+      index < 0
+        ? setListBounds(list, index).set(0, value)
+        : setListBounds(list, 0, index + 1).set(index, value);
     });
   }
 
@@ -397,8 +433,14 @@ function updateList(list, index, value) {
   if (index >= getTailOffset(list._capacity)) {
     newTail = updateVNode(newTail, list.__ownerID, 0, index, value, didAlter);
   } else {
-    newRoot = updateVNode(newRoot, list.__ownerID, list._level, index, value,
-                          didAlter);
+    newRoot = updateVNode(
+      newRoot,
+      list.__ownerID,
+      list._level,
+      index,
+      value,
+      didAlter
+    );
   }
 
   if (!didAlter.value) {
@@ -426,8 +468,14 @@ function updateVNode(node, ownerID, level, index, value, didAlter) {
 
   if (level > 0) {
     const lowerNode = node && node.array[idx];
-    const newLowerNode =
-        updateVNode(lowerNode, ownerID, level - SHIFT, index, value, didAlter);
+    const newLowerNode = updateVNode(
+      lowerNode,
+      ownerID,
+      level - SHIFT,
+      index,
+      value,
+      didAlter
+    );
     if (newLowerNode === lowerNode) {
       return node;
     }
@@ -488,9 +536,12 @@ function setListBounds(list, begin, end) {
   let oldOrigin = list._origin;
   let oldCapacity = list._capacity;
   let newOrigin = oldOrigin + begin;
-  let newCapacity = end === undefined ? oldCapacity
-                    : end < 0         ? oldCapacity + end
-                                      : oldOrigin + end;
+  let newCapacity =
+    end === undefined
+      ? oldCapacity
+      : end < 0
+      ? oldCapacity + end
+      : oldOrigin + end;
   if (newOrigin === oldOrigin && newCapacity === oldCapacity) {
     return list;
   }
@@ -507,7 +558,9 @@ function setListBounds(list, begin, end) {
   let offsetShift = 0;
   while (newOrigin + offsetShift < 0) {
     newRoot = new VNode(
-        newRoot && newRoot.array.length ? [ undefined, newRoot ] : [], owner);
+      newRoot && newRoot.array.length ? [undefined, newRoot] : [],
+      owner
+    );
     newLevel += SHIFT;
     offsetShift += 1 << newLevel;
   }
@@ -523,21 +576,29 @@ function setListBounds(list, begin, end) {
 
   // New size might need creating a higher root.
   while (newTailOffset >= 1 << (newLevel + SHIFT)) {
-    newRoot =
-        new VNode(newRoot && newRoot.array.length ? [ newRoot ] : [], owner);
+    newRoot = new VNode(
+      newRoot && newRoot.array.length ? [newRoot] : [],
+      owner
+    );
     newLevel += SHIFT;
   }
 
   // Locate or create the new tail.
   const oldTail = list._tail;
-  let newTail = newTailOffset < oldTailOffset
-                    ? listNodeFor(list, newCapacity - 1)
-                : newTailOffset > oldTailOffset ? new VNode([], owner)
-                                                : oldTail;
+  let newTail =
+    newTailOffset < oldTailOffset
+      ? listNodeFor(list, newCapacity - 1)
+      : newTailOffset > oldTailOffset
+      ? new VNode([], owner)
+      : oldTail;
 
   // Merge Tail into tree.
-  if (oldTail && newTailOffset > oldTailOffset && newOrigin < oldCapacity &&
-      oldTail.array.length) {
+  if (
+    oldTail &&
+    newTailOffset > oldTailOffset &&
+    newOrigin < oldCapacity &&
+    oldTail.array.length
+  ) {
     newRoot = editableVNode(newRoot, owner);
     let node = newRoot;
     for (let level = newLevel; level > SHIFT; level -= SHIFT) {
@@ -583,8 +644,11 @@ function setListBounds(list, begin, end) {
       newRoot = newRoot.removeBefore(owner, newLevel, newOrigin - offsetShift);
     }
     if (newRoot && newTailOffset < oldTailOffset) {
-      newRoot =
-          newRoot.removeAfter(owner, newLevel, newTailOffset - offsetShift);
+      newRoot = newRoot.removeAfter(
+        owner,
+        newLevel,
+        newTailOffset - offsetShift
+      );
     }
     if (offsetShift) {
       newOrigin -= offsetShift;

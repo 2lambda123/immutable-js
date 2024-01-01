@@ -1,27 +1,33 @@
-import {KeyedCollection} from './Collection';
-import {emptyList} from './List';
-import {emptyMap, Map} from './Map';
-import {IS_ORDERED_SYMBOL} from './predicates/isOrdered';
-import {isOrderedMap} from './predicates/isOrderedMap';
-import {DELETE, NOT_SET, SIZE} from './TrieUtils';
+import { KeyedCollection } from './Collection';
+import { emptyList } from './List';
+import { emptyMap, Map } from './Map';
+import { IS_ORDERED_SYMBOL } from './predicates/isOrdered';
+import { isOrderedMap } from './predicates/isOrderedMap';
+import { DELETE, NOT_SET, SIZE } from './TrieUtils';
 import assertNotInfinite from './utils/assertNotInfinite';
 
 export class OrderedMap extends Map {
   // @pragma Construction
 
   constructor(value) {
-    return value === undefined || value === null ? emptyOrderedMap()
-           : isOrderedMap(value)                 ? value
-                                 : emptyOrderedMap().withMutations(map => {
-                                     const iter = KeyedCollection(value);
-                                     assertNotInfinite(iter.size);
-                                     iter.forEach((v, k) => map.set(k, v));
-                                   });
+    return value === undefined || value === null
+      ? emptyOrderedMap()
+      : isOrderedMap(value)
+      ? value
+      : emptyOrderedMap().withMutations(map => {
+          const iter = KeyedCollection(value);
+          assertNotInfinite(iter.size);
+          iter.forEach((v, k) => map.set(k, v));
+        });
   }
 
-  static of(/*...values*/) { return this(arguments); }
+  static of(/*...values*/) {
+    return this(arguments);
+  }
 
-  toString() { return this.__toString('OrderedMap {', '}'); }
+  toString() {
+    return this.__toString('OrderedMap {', '}');
+  }
 
   // @pragma Access
 
@@ -46,13 +52,19 @@ export class OrderedMap extends Map {
     return emptyOrderedMap();
   }
 
-  set(k, v) { return updateOrderedMap(this, k, v); }
+  set(k, v) {
+    return updateOrderedMap(this, k, v);
+  }
 
-  remove(k) { return updateOrderedMap(this, k, NOT_SET); }
+  remove(k) {
+    return updateOrderedMap(this, k, NOT_SET);
+  }
 
   __iterate(fn, reverse) {
-    return this._list.__iterate(entry => entry && fn(entry[1], entry[0], this),
-                                reverse);
+    return this._list.__iterate(
+      entry => entry && fn(entry[1], entry[0], this),
+      reverse
+    );
   }
 
   __iterator(type, reverse) {
@@ -100,8 +112,10 @@ function makeOrderedMap(map, list, ownerID, hash) {
 
 let EMPTY_ORDERED_MAP;
 export function emptyOrderedMap() {
-  return (EMPTY_ORDERED_MAP ||
-          (EMPTY_ORDERED_MAP = makeOrderedMap(emptyMap(), emptyList())));
+  return (
+    EMPTY_ORDERED_MAP ||
+    (EMPTY_ORDERED_MAP = makeOrderedMap(emptyMap(), emptyList()))
+  );
 }
 
 function updateOrderedMap(omap, k, v) {
@@ -118,7 +132,11 @@ function updateOrderedMap(omap, k, v) {
     }
     if (list.size >= SIZE && list.size >= map.size * 2) {
       newList = list.filter((entry, idx) => entry !== undefined && i !== idx);
-      newMap = newList.toKeyedSeq().map(entry => entry[0]).flip().toMap();
+      newMap = newList
+        .toKeyedSeq()
+        .map(entry => entry[0])
+        .flip()
+        .toMap();
       if (omap.__ownerID) {
         newMap.__ownerID = newList.__ownerID = omap.__ownerID;
       }
@@ -131,10 +149,10 @@ function updateOrderedMap(omap, k, v) {
       return omap;
     }
     newMap = map;
-    newList = list.set(i, [ k, v ]);
+    newList = list.set(i, [k, v]);
   } else {
     newMap = map.set(k, list.size);
-    newList = list.set(list.size, [ k, v ]);
+    newList = list.set(list.size, [k, v]);
   }
   if (omap.__ownerID) {
     omap.size = newMap.size;
