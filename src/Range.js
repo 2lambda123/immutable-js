@@ -1,9 +1,8 @@
-import { wrapIndex, wholeSlice, resolveBegin, resolveEnd } from './TrieUtils';
-import { IndexedSeq } from './Seq';
-import { Iterator, iteratorValue, iteratorDone } from './Iterator';
-
-import invariant from './utils/invariant';
+import {Iterator, iteratorDone, iteratorValue} from './Iterator';
+import {IndexedSeq} from './Seq';
+import {resolveBegin, resolveEnd, wholeSlice, wrapIndex} from './TrieUtils';
 import deepEqual from './utils/deepEqual';
+import invariant from './utils/invariant';
 
 /**
  * Returns a lazy seq of nums from start (inclusive) to end
@@ -16,14 +15,10 @@ export class Range extends IndexedSeq {
       return new Range(start, end, step);
     }
     invariant(step !== 0, 'Cannot step a Range by 0');
-    invariant(
-      start !== undefined,
-      'You must define a start value when using Range'
-    );
-    invariant(
-      end !== undefined,
-      'You must define an end value when using Range'
-    );
+    invariant(start !== undefined,
+              'You must define a start value when using Range');
+    invariant(end !== undefined,
+              'You must define an end value when using Range');
 
     step = Math.abs(step);
     if (end < start) {
@@ -45,29 +40,19 @@ export class Range extends IndexedSeq {
     if (this.size === 0) {
       return 'Range []';
     }
-    return (
-      'Range [ ' +
-      this._start +
-      '...' +
-      this._end +
-      (this._step !== 1 ? ' by ' + this._step : '') +
-      ' ]'
-    );
+    return ('Range [ ' + this._start + '...' + this._end +
+            (this._step !== 1 ? ' by ' + this._step : '') + ' ]');
   }
 
   get(index, notSetValue) {
-    return this.has(index)
-      ? this._start + wrapIndex(this, index) * this._step
-      : notSetValue;
+    return this.has(index) ? this._start + wrapIndex(this, index) * this._step
+                           : notSetValue;
   }
 
   includes(searchValue) {
     const possibleIndex = (searchValue - this._start) / this._step;
-    return (
-      possibleIndex >= 0 &&
-      possibleIndex < this.size &&
-      possibleIndex === Math.floor(possibleIndex)
-    );
+    return (possibleIndex >= 0 && possibleIndex < this.size &&
+            possibleIndex === Math.floor(possibleIndex));
   }
 
   slice(begin, end) {
@@ -79,11 +64,8 @@ export class Range extends IndexedSeq {
     if (end <= begin) {
       return new Range(0, 0);
     }
-    return new Range(
-      this.get(begin, this._end),
-      this.get(end, this._end),
-      this._step
-    );
+    return new Range(this.get(begin, this._end), this.get(end, this._end),
+                     this._step);
   }
 
   indexOf(searchValue) {
@@ -97,9 +79,7 @@ export class Range extends IndexedSeq {
     return -1;
   }
 
-  lastIndexOf(searchValue) {
-    return this.indexOf(searchValue);
-  }
+  lastIndexOf(searchValue) { return this.indexOf(searchValue); }
 
   __iterate(fn, reverse) {
     const size = this.size;
@@ -132,10 +112,9 @@ export class Range extends IndexedSeq {
 
   equals(other) {
     return other instanceof Range
-      ? this._start === other._start &&
-          this._end === other._end &&
-          this._step === other._step
-      : deepEqual(this, other);
+               ? this._start === other._start && this._end === other._end &&
+                     this._step === other._step
+               : deepEqual(this, other);
   }
 }
 

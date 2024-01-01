@@ -2,12 +2,12 @@ var typescript = require('typescript');
 const makeSynchronous = require('make-synchronous');
 
 const TYPESCRIPT_OPTIONS = {
-  noEmitOnError: true,
-  target: typescript.ScriptTarget.ES2015,
-  module: typescript.ModuleKind.CommonJS,
-  strictNullChecks: true,
-  sourceMap: true,
-  inlineSourceMap: true,
+  noEmitOnError : true,
+  target : typescript.ScriptTarget.ES2015,
+  module : typescript.ModuleKind.CommonJS,
+  strictNullChecks : true,
+  sourceMap : true,
+  inlineSourceMap : true,
 };
 
 function transpileTypeScript(src, path) {
@@ -25,30 +25,29 @@ function transpileJavaScript(src, path) {
 
     // same input options as in rollup-config.js
     const inputOptions = {
-      input: path,
-      onwarn: () => {},
-      plugins: [commonjs(), json(), buble()],
+      input : path,
+      onwarn : () => {},
+      plugins : [ commonjs(), json(), buble() ],
     };
 
     const bundle = await rollup.rollup(inputOptions);
 
-    const { output } = await bundle.generate({
-      file: path,
-      format: 'cjs',
-      sourcemap: true,
+    const {output} = await bundle.generate({
+      file : path,
+      format : 'cjs',
+      sourcemap : true,
     });
 
     await bundle.close();
 
-    const { code, map } = output[0];
+    const {code, map} = output[0];
 
     if (!code) {
       throw new Error(
-        'Unable to get code from rollup output in jestPreprocessor. Did rollup version changed ?'
-      );
+          'Unable to get code from rollup output in jestPreprocessor. Did rollup version changed ?');
     }
 
-    return { code, map };
+    return {code, map};
   });
 
   return fn(path);
@@ -57,19 +56,21 @@ function transpileJavaScript(src, path) {
 module.exports = {
   process(src, path) {
     if (path.endsWith('__tests__/MultiRequire.js')) {
-      // exit early for multi-require as we explicitly want to have several instances
-      return { code: src };
+      // exit early for multi-require as we explicitly want to have several
+      // instances
+      return {code : src};
     }
 
     if (path.endsWith('.ts') || path.endsWith('.tsx')) {
-      return { code: transpileTypeScript(src, path) };
+      return {code : transpileTypeScript(src, path)};
     }
 
     return transpileJavaScript(src, path);
   },
 
   getCacheKey() {
-    // ignore cache, as there is a conflict between rollup compile and jest preprocessor.
+    // ignore cache, as there is a conflict between rollup compile and jest
+    // preprocessor.
     return Date.now().toString();
   },
 };
