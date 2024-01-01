@@ -1,32 +1,26 @@
-import { wholeSlice, resolveBegin, resolveEnd, wrapIndex } from './TrieUtils';
-import { IndexedCollection } from './Collection';
-import { ArraySeq } from './Seq';
-import { Iterator, iteratorValue, iteratorDone } from './Iterator';
-import { IS_STACK_SYMBOL, isStack } from './predicates/isStack';
+import {IndexedCollection} from './Collection';
+import {Iterator, iteratorDone, iteratorValue} from './Iterator';
+import {asImmutable} from './methods/asImmutable';
+import {asMutable} from './methods/asMutable';
+import {wasAltered} from './methods/wasAltered';
+import {withMutations} from './methods/withMutations';
+import {IS_STACK_SYMBOL, isStack} from './predicates/isStack';
+import {ArraySeq} from './Seq';
+import {resolveBegin, resolveEnd, wholeSlice, wrapIndex} from './TrieUtils';
 import assertNotInfinite from './utils/assertNotInfinite';
-import { asImmutable } from './methods/asImmutable';
-import { asMutable } from './methods/asMutable';
-import { wasAltered } from './methods/wasAltered';
-import { withMutations } from './methods/withMutations';
 
 export class Stack extends IndexedCollection {
   // @pragma Construction
 
   constructor(value) {
-    return value === undefined || value === null
-      ? emptyStack()
-      : isStack(value)
-      ? value
-      : emptyStack().pushAll(value);
+    return value === undefined || value === null ? emptyStack()
+           : isStack(value)                      ? value
+                                                 : emptyStack().pushAll(value);
   }
 
-  static of(/*...values*/) {
-    return this(arguments);
-  }
+  static of(/*...values*/) { return this(arguments); }
 
-  toString() {
-    return this.__toString('Stack [', ']');
-  }
+  toString() { return this.__toString('Stack [', ']'); }
 
   // @pragma Access
 
@@ -39,9 +33,7 @@ export class Stack extends IndexedCollection {
     return head ? head.value : notSetValue;
   }
 
-  peek() {
-    return this._head && this._head.value;
-  }
+  peek() { return this._head && this._head.value; }
 
   // @pragma Modification
 
@@ -53,8 +45,8 @@ export class Stack extends IndexedCollection {
     let head = this._head;
     for (let ii = arguments.length - 1; ii >= 0; ii--) {
       head = {
-        value: arguments[ii],
-        next: head,
+        value : arguments[ii],
+        next : head,
       };
     }
     if (this.__ownerID) {
@@ -81,8 +73,8 @@ export class Stack extends IndexedCollection {
     iter.__iterate(value => {
       newSize++;
       head = {
-        value: value,
-        next: head,
+        value : value,
+        next : head,
       };
     }, /* reverse */ true);
     if (this.__ownerID) {
@@ -95,9 +87,7 @@ export class Stack extends IndexedCollection {
     return makeStack(newSize, head);
   }
 
-  pop() {
-    return this.slice(1);
-  }
+  pop() { return this.slice(1); }
 
   clear() {
     if (this.size === 0) {
@@ -159,10 +149,8 @@ export class Stack extends IndexedCollection {
 
   __iterate(fn, reverse) {
     if (reverse) {
-      return new ArraySeq(this.toArray()).__iterate(
-        (v, k) => fn(v, k, this),
-        reverse
-      );
+      return new ArraySeq(this.toArray())
+          .__iterate((v, k) => fn(v, k, this), reverse);
     }
     let iterations = 0;
     let node = this._head;
@@ -203,9 +191,7 @@ function makeStack(size, head, ownerID, hash) {
 }
 
 let EMPTY_STACK;
-function emptyStack() {
-  return EMPTY_STACK || (EMPTY_STACK = makeStack(0));
-}
+function emptyStack() { return EMPTY_STACK || (EMPTY_STACK = makeStack(0)); }
 
 Stack.isStack = isStack;
 
@@ -218,11 +204,9 @@ StackPrototype.withMutations = withMutations;
 StackPrototype.wasAltered = wasAltered;
 StackPrototype.asImmutable = asImmutable;
 StackPrototype['@@transducer/init'] = StackPrototype.asMutable = asMutable;
-StackPrototype['@@transducer/step'] = function (result, arr) {
-  return result.unshift(arr);
-};
-StackPrototype['@@transducer/result'] = function (obj) {
-  return obj.asImmutable();
-};
+StackPrototype['@@transducer/step'] = function(
+    result, arr) { return result.unshift(arr); };
+StackPrototype['@@transducer/result'] = function(
+    obj) { return obj.asImmutable(); };
 
 StackPrototype.__empty = emptyStack;
